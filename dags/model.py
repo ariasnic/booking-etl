@@ -1,7 +1,6 @@
-import uuid
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, Date
+from sqlalchemy import create_engine, Column, String, Integer, Float
 
 
 class Connection(object):
@@ -25,17 +24,16 @@ Base = declarative_base()
 class Report(Base):
     __tablename__ = 'report'
     
-    report_id = Column(Integer, primary_key=True)
+    report_id = Column(Integer, autoincrement=True, primary_key=True)
     restaurant_id = Column(String)
     restaurant_name = Column(String)
     country = Column(String)
-    month = Column(DateTime)
+    month = Column(String)
     number_of_bookings = Column(Integer)
     number_of_guests = Column(Integer)
     amount = Column(Float)
 
-    def __init__(self, report_id, restaurant_id, restaurant_name, country, month, number_of_bookings, number_of_guests, amount):
-        self.report_id = report_id
+    def __init__(self, restaurant_id, restaurant_name, country, month, number_of_bookings, number_of_guests, amount):
         self.restaurant_id = restaurant_id
         self.restaurant_name = restaurant_name
         self.country = country
