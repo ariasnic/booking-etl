@@ -56,12 +56,12 @@ class BookingTransform:
     def save_report_to_csv(self, df_report, most_recent_filename):
         output_filename = 'report_' + most_recent_filename
         output_filepath = os.path.join(config.REPORT_CSV_FILE_DIR, output_filename)
-        #context = get_current_context()
-        #ti = context["ti"]
+        context = get_current_context()
+        ti = context["ti"]
         try:
             df_report.to_csv(output_filepath, encoding='utf-8', index=False)
             # xcom push filename to use it in next task
-            #ti.xcom_push(key='output_filepath', value=output_filepath)
+            ti.xcom_push(key='output_filepath', value=output_filepath)
         except Exception as e:
             logging.info("Error on csv export : %s", e)
 
@@ -71,7 +71,7 @@ class BookingTransform:
         df_booking = pd.read_csv(most_recent_file_path)
         df_booking = self.convert_currency(df_booking)
         df_booking['country'] = df_booking['country'].replace(self.country_translation)
-        # convert date to datetime format
+        # convert date to datetime format, possibility to do it with regex
         df_booking['date'] = pd.to_datetime(df_booking['date'], format='%d/%m/%Y', errors='coerce').fillna(pd.to_datetime(df_booking['date'], format='%d-%m-%Y', errors="coerce"))
         pd.set_option('display.max_columns', None)
 

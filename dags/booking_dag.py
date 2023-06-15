@@ -41,7 +41,7 @@ with DAG(
             amount FLOAT NOT NULL);
           """,
     )
-    
+
     data_processor = BookingTransform()
 
     @task(task_id="transform_booking")
@@ -58,6 +58,4 @@ with DAG(
 
     upload_data_to_db = upload_data_to_db()
 
-    test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
-
-    create_report_table >> transform_booking >> upload_data_to_db >> test_report
+    create_report_table >> transform_booking >> upload_data_to_db
