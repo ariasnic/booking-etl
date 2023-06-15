@@ -1,1 +1,4 @@
 currencyconverter==0.17.7
+unittest
+pytest
+apache-airflow
