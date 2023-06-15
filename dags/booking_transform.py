@@ -1,4 +1,4 @@
-from logging import Logger
+import logging
 import os
 
 from currency_converter import CurrencyConverter
@@ -8,7 +8,7 @@ import re
 import config
 
 
-class DataProcessor:
+class BookingTransform:
     def __init__(self):
         self.rename_header = { 
             'date': 'month',
@@ -60,7 +60,7 @@ class DataProcessor:
             # xcom push filename to use it in next task
             ti.xcom_push(key='output_filepath', value=output_filepath)
         except Exception:
-            Logger.info("Error on csv export")
+            logging.info("Error on csv export")
 
     def transform_booking_dataset(self, ti):
         most_recent_file_name = self.get_most_recent_file()
@@ -69,9 +69,13 @@ class DataProcessor:
         df_booking = self.convert_currency(df_booking)
         df_booking['country'] = df_booking['country'].replace(self.country_translation)
         # convert date to datetime format
-        df_booking['date'] = pd.to_datetime(df_booking['date'], format='mixed')
-        # agg to create the report
-        df_report = df_booking.groupby(['restaurant_id', 'restaurant_name', 'country', pd.Grouper(key='date',freq="M")]).agg(
+        df_booking['date'] = pd.to_datetime(df_booking['date'], dayfirst=True, format='mixed')
+        pd.set_option('display.max_columns', None)
+
+        print("df_booking DataFrame:")
+        print(df_booking)
+        # agg to create the report CHANGE
+        df_report = df_booking.groupby([pd.Grouper(key='date',freq="M"), pd.Grouper('restaurant_id'), pd.Grouper('restaurant_name'), pd.Grouper('country')]).agg(
         {
             'booking_id': 'count',
             'guests': 'sum',

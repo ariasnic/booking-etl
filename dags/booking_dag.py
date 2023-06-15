@@ -6,7 +6,7 @@ from airflow.utils.dates import days_ago
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
-from booking_transform import DataProcessor
+from booking_transform import BookingTransform
 from upload_report_to_db import upload_report_csv_to_db
 from airflow.decorators import task
 
@@ -40,10 +40,10 @@ with DAG(
             amount FLOAT NOT NULL);
           """,
     )
-    data_processor = DataProcessor()
+    data_processor = BookingTransform()
 
     @task(task_id="transform_booking")
-    def transform_booking():
+    def transform_booking(task_instance):
         return data_processor.transform_booking_dataset(ti=task_instance)
 
     transform_booking = transform_booking()
