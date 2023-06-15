@@ -1,0 +1,17 @@
+booking_id,restaurant_id,restaurant_name,client_id,client_name,amount,guests,date,country
+booking_id_1,restaurant_id_1,restaurant_name_1,client_id_1,client_name_1,£10.50,9,11/03/2017,United Kingdom
+booking_id_2,restaurant_id_1,restaurant_name_1,client_id_2,client_name_2,£20.75,4,10/06/2019,United Kingdom
+booking_id_3,restaurant_id_1,restaurant_name_1,client_id_3,client_name_3,£30.90,8,29/06/2019,United Kingdom
+booking_id_4,restaurant_id_1,restaurant_name_1,client_id_1,client_name_1,£15.25,5,14/06/2019,United Kingdom
+booking_id_5,restaurant_id_1,restaurant_name_1,client_id_2,client_name_2,£25.50,3,23/03/2017,United Kingdom
+booking_id_6,restaurant_id_1,restaurant_name_1,client_id_3,client_name_3,£35.75,7,05/03/2017,United Kingdom
+booking_id_7,restaurant_id_2,restaurant_name_2,client_id_3,client_name_3,"20,75 €",4,10-08-2016,France
+booking_id_8,restaurant_id_2,restaurant_name_2,client_id_1,client_name_1,"25,50 €",3,23-09-2018,France
+booking_id_9,restaurant_id_2,restaurant_name_2,client_id_2,client_name_2,"18,50 €",5,12-09-2018,France
+booking_id_10,restaurant_id_2,restaurant_name_2,client_id_3,client_name_3,"21,25 €",6,03-08-2016,France
+booking_id_13,restaurant_id_3,restaurant_name_3,client_id_2,client_name_2,"60,90 €",8,29/01/2017,Italia
+booking_id_15,restaurant_id_3,restaurant_name_3,client_id_1,client_name_1,"27,50 €",9,18/09/2017,Italia
+booking_id_14,restaurant_id_3,restaurant_name_3,client_id_3,client_name_3,"35,75 €",7,05/01/2017,Italia
+booking_id_16,restaurant_id_3,restaurant_name_3,client_id_2,client_name_2,"62,75 €",5,09/09/2017,Italia
+booking_id_21,restaurant_id_1,restaurant_name_1,client_id_1,client_name_1,£12.50,6,16/06/2019,United Kingdom
+booking_id_22,restaurant_id_1,restaurant_name_1,client_id_2,client_name_2,£18.75,3,20/06/2019,United Kingdom

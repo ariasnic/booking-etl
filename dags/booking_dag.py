@@ -6,8 +6,10 @@ from airflow.utils.dates import days_ago
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
-from booking_transform import transform_booking_dataset
-from upload_report_to_db import upload_report_csv_to_db
+from booking_transform import BookingTransform
+from upload_report_to_db import UploadReportCSVToDB
+from airflow.decorators import task
+from airflow.models.taskinstance import TaskInstance
 
 
 default_args = {
@@ -33,19 +35,27 @@ with DAG(
             restaurant_id VARCHAR NOT NULL,
             restaurant_name VARCHAR NOT NULL,
             country VARCHAR NOT NULL,
-            month DATE NOT NULL,
+            month VARCHAR NOT NULL,
             number_of_bookings INT NOT NULL,
             number_of_guests INT NOT NULL,
             amount FLOAT NOT NULL);
           """,
     )
-    transform_booking = PythonOperator(task_id='transform_booking', python_callable=transform_booking_dataset)
 
-    upload_data_to_db = PythonOperator(task_id='upload_data_to_db', python_callable=upload_report_csv_to_db)
+    data_processor = BookingTransform()
 
-    test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
+    @task(task_id="transform_booking")
+    def transform_booking():
+        return data_processor.transform_booking_dataset()
 
-    create_report_table >> transform_booking >> upload_data_to_db >> test_report
+    transform_booking = transform_booking()
 
-    if __name__ == "__main__":
-        dag.test()
+    save_report_to_db = UploadReportCSVToDB()
+
+    @task(task_id="upload_data_to_db")
+    def upload_data_to_db():
+        return save_report_to_db.upload_data()
+
+    upload_data_to_db = upload_data_to_db()
+
+    create_report_table >> transform_booking >> upload_data_to_db
