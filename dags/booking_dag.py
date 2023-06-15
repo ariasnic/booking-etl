@@ -7,8 +7,9 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from booking_transform import BookingTransform
-from upload_report_to_db import upload_report_csv_to_db
+from upload_report_to_db import UploadReportCSVToDB
 from airflow.decorators import task
+from airflow.models.taskinstance import TaskInstance
 
 
 default_args = {
@@ -40,19 +41,23 @@ with DAG(
             amount FLOAT NOT NULL);
           """,
     )
+    
     data_processor = BookingTransform()
 
     @task(task_id="transform_booking")
-    def transform_booking(task_instance):
-        return data_processor.transform_booking_dataset(ti=task_instance)
+    def transform_booking():
+        return data_processor.transform_booking_dataset()
 
     transform_booking = transform_booking()
 
-    upload_data_to_db = PythonOperator(task_id='upload_data_to_db', python_callable=upload_report_csv_to_db)
+    save_report_to_db = UploadReportCSVToDB()
+
+    @task(task_id="upload_data_to_db")
+    def upload_data_to_db():
+        return save_report_to_db.upload_data()
+
+    upload_data_to_db = upload_data_to_db()
 
     test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
 
     create_report_table >> transform_booking >> upload_data_to_db >> test_report
-
-    if __name__ == "__main__":
-        dag.test()

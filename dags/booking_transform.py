@@ -4,6 +4,7 @@ import os
 from currency_converter import CurrencyConverter
 import pandas as pd
 import re
+from airflow.operators.python import get_current_context
 
 import config
 
@@ -52,30 +53,32 @@ class BookingTransform:
         most_recent_file_name = sorted(dataset_list, reverse=True).pop(0)
         return most_recent_file_name
 
-    def save_report_to_csv(self, df_report, most_recent_filename, ti):
+    def save_report_to_csv(self, df_report, most_recent_filename):
         output_filename = 'report_' + most_recent_filename
         output_filepath = os.path.join(config.REPORT_CSV_FILE_DIR, output_filename)
+        #context = get_current_context()
+        #ti = context["ti"]
         try:
             df_report.to_csv(output_filepath, encoding='utf-8', index=False)
             # xcom push filename to use it in next task
-            ti.xcom_push(key='output_filepath', value=output_filepath)
-        except Exception:
-            logging.info("Error on csv export")
+            #ti.xcom_push(key='output_filepath', value=output_filepath)
+        except Exception as e:
+            logging.info("Error on csv export : %s", e)
 
-    def transform_booking_dataset(self, ti):
+    def transform_booking_dataset(self):
         most_recent_file_name = self.get_most_recent_file()
         most_recent_file_path = os.path.join(config.DATASET_CSV_FILE_DIR, most_recent_file_name)
         df_booking = pd.read_csv(most_recent_file_path)
         df_booking = self.convert_currency(df_booking)
         df_booking['country'] = df_booking['country'].replace(self.country_translation)
         # convert date to datetime format
-        df_booking['date'] = pd.to_datetime(df_booking['date'], dayfirst=True, format='mixed')
+        df_booking['date'] = pd.to_datetime(df_booking['date'], format='%d/%m/%Y', errors='coerce').fillna(pd.to_datetime(df_booking['date'], format='%d-%m-%Y', errors="coerce"))
         pd.set_option('display.max_columns', None)
 
         print("df_booking DataFrame:")
         print(df_booking)
         # agg to create the report CHANGE
-        df_report = df_booking.groupby([pd.Grouper(key='date',freq="M"), pd.Grouper('restaurant_id'), pd.Grouper('restaurant_name'), pd.Grouper('country')]).agg(
+        df_report = df_booking.groupby([pd.Grouper(key='date',freq="M"),'restaurant_id', 'restaurant_name', 'country']).agg(
         {
             'booking_id': 'count',
             'guests': 'sum',
@@ -86,5 +89,5 @@ class BookingTransform:
         # convert datetime to YYYY_MM
         df_report['date'] = df_report['date'].dt.strftime('%Y_%m')
         df_report = df_report.rename(columns=self.rename_header)
-        self.save_report_to_csv(df_report, most_recent_file_name, ti)
+        self.save_report_to_csv(df_report, most_recent_file_name)
         return df_report
