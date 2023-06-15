@@ -5,18 +5,18 @@ docker-compose build
 docker-compose up
 
 ## Set credentials :
-<password> doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
+__password__ doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
 
 - Admin → Variables
     - Key : data_dev_connection
-    - Value : postgresql+psycopg2://airflow:<password>@postgres/airflow
+    - Value : postgresql+psycopg2://airflow:__password__@postgres/airflow
 - Admin → Connections
     - Connection Id : postgres_local
     - Connection Type : Postgres
     - Host : postgres
     - Schema : airflow
     - Login : airflow
-    - Password : <password>
+    - Password : __password__
     - Port : 5432
 
 # Test
