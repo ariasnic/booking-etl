@@ -3,7 +3,7 @@
 ## Create a .env file at the root
 _password_ doesn't have to contain the value _airflow_ in it, otherwise it will not be usable.
 ```
-AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:__password__@postgres/airflow
+AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:<password>@postgres/airflow
 AIRFLOW__CORE__EXECUTOR=LocalExecutor
 ```
 
