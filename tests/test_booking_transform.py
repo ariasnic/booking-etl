@@ -1,15 +1,28 @@
+from unittest import TestCase, main
+from unittest.mock import patch, MagicMock, Mock
+from functools import wraps
+import sys
+sys.path.append('..')
 from dags.booking_transform import BookingTransform
-from unittest import TestCase, mock, main
-from unittest.mock import patch, MagicMock
+
 
 import pandas as pd
 
 class TestBookingTransform(TestCase):
     def setUp(self):
+
+
+
+
         # Create an instance of BookingTransform for testing
         self.data_processor = BookingTransform()
 
     def test_convert_currency(self):
+        # Create a mock TaskInstance object
+        mock_logger = MagicMock()
+
+        # Set the return value of the mocked get_current_context() function
+        mock_logger.return_value = None
         # Create a sample DataFrame for testing
         df_booking = pd.DataFrame(
             {
@@ -51,9 +64,13 @@ class TestBookingTransform(TestCase):
         expected_result = expected_result.reindex(sorted(expected_result.columns), axis=1)
 
         self.assertTrue(result.equals(expected_result), "Currency conversion for pounds is incorrect.")
-
-    #@mock.patch('config.DATASET_CSV_FILE_DIR', './tests/data/datasets')
+    
     def test_get_most_recent_file(self):
+        # Create a mock TaskInstance object
+        mock_logger = MagicMock()
+
+        # Set the return value of the mocked get_current_context() function
+        mock_logger.return_value = None
         # Call the function to get the most recent file. Sample files are present in /tests/data/datasets
         result = self.data_processor.get_most_recent_file()
 
@@ -65,11 +82,17 @@ class TestBookingTransform(TestCase):
     
     @patch("dags.booking_transform.get_current_context")
     def test_transform_booking_dataset(self, mock_get_current_context):
-         # Create a mock TaskInstance object
+        # Create a mock TaskInstance object
         mock_ti = MagicMock()
 
         # Set the return value of the mocked get_current_context() function
         mock_get_current_context.return_value = {"ti": mock_ti}
+
+        # Create a mock TaskInstance object
+        mock_logger = MagicMock()
+
+        # Set the return value of the mocked get_current_context() function
+        mock_logger.return_value = None
         # Perform the transformation
         result = self.data_processor.transform_booking_dataset()
 

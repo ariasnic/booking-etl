@@ -3,13 +3,10 @@ import os
 
 from airflow import DAG
 from airflow.utils.dates import days_ago
-from airflow.utils.trigger_rule import TriggerRule
-from airflow.operators.python_operator import PythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from booking_transform import BookingTransform
 from upload_report_to_db import UploadReportCSVToDB
 from airflow.decorators import task
-from airflow.models.taskinstance import TaskInstance
 
 
 default_args = {
@@ -21,7 +18,7 @@ default_args = {
 with DAG(
     'generate_report',
     default_args=default_args,
-    description='',
+    description='This DAG create a monthly statistics by restaurants report, output the csv and store the rows in a DB',
     schedule_interval="@monthly",
     start_date=days_ago(31),
     catchup=True

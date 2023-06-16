@@ -1,39 +1,62 @@
 # Run
 
+## Create a .env file at the root
+_password_ doesn't have to contain the value _airflow_ in it, otherwise it will not be usable.
+```
+AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:<password>@postgres/airflow
+AIRFLOW__CORE__EXECUTOR=LocalExecutor
+```
+
+## Build and run the docker-compose containers
+```bash
 docker-compose build
-
 docker-compose up
+```
 
-## Set credentials :
-<password> doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
+## Set credentials in Airflow admin panel:
 
-- Admin → Variables
+- Admin → Variables, add : 
     - Key : data_dev_connection
-    - Value : postgresql+psycopg2://airflow:<password>@postgres/airflow
-- Admin → Connections
+    - Value : postgresql+psycopg2://airflow:_password_@postgres/airflow
+- Admin → Connections, add : 
     - Connection Id : postgres_local
     - Connection Type : Postgres
     - Host : postgres
     - Schema : airflow
     - Login : airflow
-    - Password : <password>
+    - Password : _password_
     - Port : 5432
 
 # Test
+```bash
+python3 -m venv ~/.env/your_env_python  
+source ~/.env/your_env_python/bin/activate  
 pip install -r requirements_dev.txt
+export PYTHONPATH=/path/to/booking-etl
+# at the project root
+pytest
+```
 
 # Arbitrations and remarks
-- I have chosen to implement only one dag, that includes the creation of the __report__ table. An other option would be to delegate the creation of the table to an other DAG, that will work as a migration of the DB.
-- I implement the DAG to run monthly and to retrieve the most recent dataset, based on the filename format : __booking_yyyy_mm_dd.csv__. For the need of this assignement, the input dataset is renamed after this format, and stored in ./dags/datasets folder. But in an industrialization process, the __get_most_recent_file__ function could be adapted to retrieve the datasets from an AWS S3 Bucket for example.
-- For this assigment, I assumed that the dataset contains 4 countries, 2 datetime formats, prices in € and pounds, unique combinations restaurant_id/restaurant_name/country. An improvment could be to test the dataset structure, and to raise an alert if anything new is added.
+- I have chosen to implement only one dag, that includes the creation of the _report_ table if it doesn't already exist. An other option would be to delegate the creation of the table to an other DAG, that will work as a migration of the DB.
+- I implemented the DAG to run monthly and to create the report based on the most recent dataset, based on the filename format : _bookings_yyyy_mm_dd.csv_. For the need of this assignement, the input dataset is renamed after this format, and stored in /booking-etl/dags/datasets folder. But in an industrialization process, the _get_most_recent_file_ function could be adapted to retrieve the datasets from an AWS S3 Bucket for example.
+- If monthly _bookings_ file contains the historical each time, it will create duplicates in the DB, so a solution could be to add a datetime column _created_at_ in the table report, 
+- For this assigment, I assumed that the dataset contains 4 countries, 2 datetime formats, prices in € and pounds, unique combinations _restaurant_id/restaurant_name/country_. An improvment could be to test the dataset structure at the beginning of the DAG, and to raise an alert if something is different.
+- The final dataset is stored as a table, but I can be an option to also store the CSV as a binary data in an other table of the DB.
 - To test the data insertion, it is possible to add a task at the end of the DAG like this : 
-    - test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
-    - or to log in locally to the postgresql DB : 'psql -U airflow -h localhost -p 5432'
+```python 
+    test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
+```
+or to log in locally to the postgresql DB : 
+```bash 
+psql -U airflow -h localhost -p 5432
+```
+- For this assignement, I have implemented tests only for the python transformation task.
 
 Assignment: ETL pipeline
 ========================
 
-Given the attached dataset (bookings.csv), we want to generate a report with monthly statistics by restaurants.
+Given the attached dataset (bookings.csv), we want to generate a w.
 
 input dataset : bookings.csv
 
