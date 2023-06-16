@@ -52,7 +52,7 @@ or to log in locally to the postgresql DB :
 ```bash 
 psql -U airflow -h localhost -p 5432
 ```
-- For this assignement, I have implemented tests only for the python transformation task.
+- For this assignement, I have implemented tests only for the python transformation task, but it would be a improvement to tests all the tasks and also the DAG itself.
 
 Assignment: ETL pipeline
 ========================
