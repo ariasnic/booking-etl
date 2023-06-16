@@ -48,7 +48,6 @@ or to log in locally to the postgresql DB :
 ```bash 
 psql -U airflow -h localhost -p 5432
 ```
-========================
 
 Assignment: ETL pipeline
 ========================
