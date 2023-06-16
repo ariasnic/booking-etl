@@ -3,8 +3,10 @@ import logging
 from airflow.models import Variable
 from model import Report, Connection
 from airflow.operators.python import get_current_context
+from utils import logger
 
 class UploadReportCSVToDB:
+    @logger
     def upload_data(self):
         context = get_current_context()
         ti = context["ti"]

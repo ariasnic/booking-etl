@@ -3,13 +3,10 @@ import os
 
 from airflow import DAG
 from airflow.utils.dates import days_ago
-from airflow.utils.trigger_rule import TriggerRule
-from airflow.operators.python_operator import PythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from booking_transform import BookingTransform
 from upload_report_to_db import UploadReportCSVToDB
 from airflow.decorators import task
-from airflow.models.taskinstance import TaskInstance
 
 
 default_args = {

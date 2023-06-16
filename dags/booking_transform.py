@@ -5,8 +5,10 @@ from currency_converter import CurrencyConverter
 import pandas as pd
 import re
 from airflow.operators.python import get_current_context
-
+import sys
+sys.path.append('dags')
 import config
+from utils import logger
 
 
 class BookingTransform:
@@ -25,12 +27,13 @@ class BookingTransform:
         pattern =  r'(\D*)[\d\,\.]+(\D*)'
         g = re.match(pattern, price.strip()).groups()
         return (g[0] or g[1]).strip()
-
+    
     def get_amount(self, price):
         pattern =  r'\D*([\d\,\.]+)\D*'
         g = re.match(pattern, price.strip()).groups()
         return g[0].strip()
 
+    @logger
     def convert_currency(self, df_booking: pd.DataFrame) -> pd.DataFrame:
         # extract currency from amount
         df_booking['amount_symbol'] = df_booking['amount'].apply(lambda x: self.get_symbol(x))
@@ -44,6 +47,7 @@ class BookingTransform:
         df_booking['amount_value'] = pd.to_numeric(df_booking['amount_value']).round(2)
         return df_booking
 
+    @logger
     def get_most_recent_file(self):
         dataset_list = []
         for filename in os.listdir(config.DATASET_CSV_FILE_DIR):
@@ -53,6 +57,7 @@ class BookingTransform:
         most_recent_file_name = sorted(dataset_list, reverse=True).pop(0)
         return most_recent_file_name
 
+    @logger
     def save_report_to_csv(self, df_report, most_recent_filename):
         output_filename = 'report_' + most_recent_filename
         output_filepath = os.path.join(config.REPORT_CSV_FILE_DIR, output_filename)
@@ -65,6 +70,7 @@ class BookingTransform:
         except Exception as e:
             logging.info("Error on csv export : %s", e)
 
+    @logger
     def transform_booking_dataset(self):
         most_recent_file_name = self.get_most_recent_file()
         most_recent_file_path = os.path.join(config.DATASET_CSV_FILE_DIR, most_recent_file_name)
@@ -73,10 +79,6 @@ class BookingTransform:
         df_booking['country'] = df_booking['country'].replace(self.country_translation)
         # convert date to datetime format, possibility to do it with regex
         df_booking['date'] = pd.to_datetime(df_booking['date'], format='%d/%m/%Y', errors='coerce').fillna(pd.to_datetime(df_booking['date'], format='%d-%m-%Y', errors="coerce"))
-        pd.set_option('display.max_columns', None)
-
-        print("df_booking DataFrame:")
-        print(df_booking)
         # agg to create the report CHANGE
         df_report = df_booking.groupby([pd.Grouper(key='date',freq="M"),'restaurant_id', 'restaurant_name', 'country']).agg(
         {
