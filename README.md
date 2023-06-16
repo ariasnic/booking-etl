@@ -14,7 +14,7 @@ docker-compose up
 ```
 
 ## Set credentials in Airflow admin panel:
-[link]http://localhost:8080/
+<http://localhost:8080/>
 - Admin → Variables, add : 
     - Key : data_dev_connection
     - Value : postgresql+psycopg2://airflow:_password_@postgres/airflow
