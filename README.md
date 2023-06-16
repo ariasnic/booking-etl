@@ -1,10 +1,17 @@
 # Run
+
 ## Create a .env file at the root
 __password__ doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
-- AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:__password__@postgres/airflow
-- AIRFLOW__CORE__EXECUTOR=LocalExecutor
-'docker-compose build'
-'docker-compose up'
+```
+AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:__password__@postgres/airflow
+AIRFLOW__CORE__EXECUTOR=LocalExecutor
+```
+
+## Build and run the docker-compose containers
+```bash
+docker-compose build
+docker-compose up
+```
 
 ## Set credentials :
 
@@ -21,9 +28,12 @@ __password__ doesn't have to contain the value __airflow__ in it, otherwise it w
     - Port : 5432
 
 # Test
-'pip install -r requirements_dev'
-'export PYTHONPATH=/path/to/booking-etl'
-'pytest # at the project root'
+```bash
+pip install -r requirements_dev.txt
+export PYTHONPATH=/path/to/booking-etl
+# at the project root
+pytest
+```
 
 # Arbitrations and remarks
 - I have chosen to implement only one dag, that includes the creation of the __report__ table. An other option would be to delegate the creation of the table to an other DAG, that will work as a migration of the DB.
