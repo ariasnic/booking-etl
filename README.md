@@ -41,11 +41,12 @@ pytest
 - For this assigment, I assumed that the dataset contains 4 countries, 2 datetime formats, prices in € and pounds, unique combinations restaurant_id/restaurant_name/country. An improvment could be to test the dataset structure, and to raise an alert if anything new is added.
 - The final dataset is stored as a table, but I can be an option to also store the CSV as a binary data in an other table of the DB.
 - To test the data insertion, it is possible to add a task at the end of the DAG like this : 
-    - test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
-    - or to log in locally to the postgresql DB : 'psql -U airflow -h localhost -p 5432'
-
-
+    - ```python 
+    test_report = PostgresOperator(task_id="test_report", postgres_conn_id="postgres_local", trigger_rule=TriggerRule.ALL_DONE, sql="SELECT * FROM report LIMIT 20;")
+    ```
+    - or to log in locally to the postgresql DB : ```bash psql -U airflow -h localhost -p 5432```
 ========================
+
 Assignment: ETL pipeline
 ========================
 
