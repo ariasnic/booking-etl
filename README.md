@@ -1,10 +1,12 @@
 # Run
-
+## Create a .env file at the root
+__password__ doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
+- AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:__password__@postgres/airflow
+- AIRFLOW__CORE__EXECUTOR=LocalExecutor
 'docker-compose build'
 'docker-compose up'
 
 ## Set credentials :
-__password__ doesn't have to contain the value __airflow__ in it, otherwise it will not be usable.
 
 - Admin → Variables
     - Key : data_dev_connection
